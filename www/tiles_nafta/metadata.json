@@ -1,0 +1,12 @@
+{
+    "attribution": "", 
+    "description": "", 
+    "center": "15.4749,49.82,7", 
+    "bounds": "12.0905,48.5384,18.847,51.0759", 
+    "minzoom": "7", 
+    "version": "1.0.0", 
+    "template": "{{#__location__}}{{/__location__}}{{#__teaser__}}{{{NAZEV}}} {{{AKTUALIZAC}}} {{{CENA}}} {{{JMENO}}}{{/__teaser__}}{{#__full__}}{{/__full__}}", 
+    "maxzoom": "13", 
+    "legend": "", 
+    "name": "ceny-benzinu"
+}

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<!--Source: http://danzel.github.io/Leaflet.utfgrid/example/map.html//-->
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<script src="https://samizdat.cz/tools/comb/leaflet-0.7.3_utfgrid.cssjs.js"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&amp;sensor=false"></script>
+	<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+	<div id="map"></div>
+	<form action="?" id='frm-geocode'>
+		<label for="inp-geocode">Najít ulici</label>
+		<div class="inputs">
+			<input type="text" id="inp-geocode" placeholder="Vinohradská 12">
+			<input type="submit" value="Najít">
+		</div>
+	</form>
+	<script>	
+		var map = L.map('map', {
+		minZoom: 7,
+		maxZoom: 13});
+		
+		var topic = L.tileLayer('tiles_benzin/{z}/{x}/{y}.png', { 
+		maxZoom: 13, 
+		zIndex: 5,
+		opacity: 0.75});
+		
+		var background = L.tileLayer('https://samizdat.cz/tiles/ton_b1/{z}/{x}/{y}.png', { 
+		attribution: 'mapová data &copy; přispěvatelé <a target="_blank" href="http://osm.org">OpenStreetMap</a>, obrazový podkres <a target="_blank" href="http://stamen.com">Stamen</a>, <a target="_blank" href="https://samizdat.cz">Samizdat</a>', 
+		maxZoom: 13, 
+		zIndex: 1});
+		
+		var labels = L.tileLayer('https://samizdat.cz/tiles/ton_l1/{z}/{x}/{y}.png', { 
+		maxZoom: 13, 
+		zIndex: 6,
+		opacity: 0.60});
+		
+		var utfGrid = new L.UtfGrid('tiles_benzin//{z}/{x}/{y}.grid.json', {
+			useJsonP: false
+		});
+		
+		utfGrid.on('mouseover', function(e){ info.update(e);}).on('mouseout', function(e){ info.update();})
+
+		var info = L.control();
+		info.options.position = 'bottomright';
+		info.onAdd = function (map) {
+		    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+		    this.update();
+		    return this._div;
+		};
+		
+		function select_name(nazob, nazmc){
+			if (nazob == "") {
+				return nazmc
+			} else {
+				return nazob
+			}
+		}
+
+		info.update = function (props) {
+			this._div.innerHTML = (props ? "<values><b>" + props.data.NAZEV + "</b><br>Natural 95 za  " + props.data.CENA + " Kč/l.<br><i>Dne " + props.data.AKTUALIZAC + "</i></values>"
+			: 'Najetím vyberte čerpací stanici');
+		};
+
+		var form = document.getElementById("frm-geocode");
+		var geocoder = null;
+		var geocodeMarker = null;
+		form.onsubmit = function(event) {
+			if (!geocoder) {
+				geocoder = new google.maps.Geocoder();
+			}
+			event.preventDefault();
+			var text = document.getElementById("inp-geocode").value;
+			geocoder.geocode({'address':text}, function(results, status) {
+				if(status !== google.maps.GeocoderStatus.OK) {
+					alert("Bohužel, danou adresu nebylo možné najít");
+					return;
+				}
+				var result = results[0];
+				var latlng = new L.LatLng(result.geometry.location.lat(), result.geometry.location.lng());
+				map.setView(latlng, 10);
+			});
+		};
+
+		map.setView([49.819957, 15.474912], 7)
+			.addLayer(utfGrid)
+			.addLayer(topic)
+			.addLayer(background)
+			.addLayer(labels)
+			.addControl(info)
+		
+	</script>
+	</body>
+</html>
