@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+	<meta charset="utf-8">
+	<title>D3 Page Template</title>
+	<script type="text/javascript" src="https://samizdat.cz/tools/d3/3.4.11.js"></script>
+	<script type="text/javascript" src="https://samizdat.cz/tools/topojson/1.6.8.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+	var w = 610;
+	
+	var h = 440;
+	
+	var projekce = d3.geo.mercator()
+					.translate([w/2, h/2])
+					.scale([500]);
+	
+	var path = d3.geo.path()
+				.projection(projekce);	
+	
+	var svg = d3.select("body")
+						.append("svg")
+						.attr("width", w)
+						.attr("height", h);
+
+
+	d3.json("../data/okresy/okresy.json", function(error, okresy) {
+		if (error) return console.error(error);
+
+		console.log(okresy);
+
+		svg.selectAll("path")
+    		.data(topojson.feature(okresy, okresy.objects.okresy))
+  			.enter()
+  			.append("path")
+    		.attr("d", path);
+
+
+	});
+
+	</script>
+</body>
+</html>
